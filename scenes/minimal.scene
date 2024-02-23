@@ -278,6 +278,7 @@
             "go": "6027ee6a-90c7-4988-b750-04ca4e092c17",
             "component_type": "CharacterController"
           },
+          "EyePosition": "0,0,60.1",
           "JumpStrength": 400,
           "RunSpeed": 250,
           "WalkSpeed": 120
@@ -287,7 +288,7 @@
         {
           "Id": "3ee1c9f4-07be-4e0b-8b23-67bee2d8ec8a",
           "Name": "Camera",
-          "Position": "-124.7614,-1.096611,77.26788",
+          "Position": "-148.985,-1.096619,83.75854",
           "Rotation": "0.000000007779966,0.1305262,-0.00000005909471,0.9914448",
           "Enabled": true,
           "Components": [
@@ -309,6 +310,7 @@
             },
             {
               "__type": "Bloom",
+              "__enabled": false,
               "BloomColor": {
                 "color": [
                   {
@@ -337,6 +339,7 @@
             },
             {
               "__type": "Tonemapping",
+              "__enabled": false,
               "ExposureCompensation": 0,
               "MaximumExposure": 2,
               "MinimumExposure": 1,
@@ -344,6 +347,7 @@
             },
             {
               "__type": "Sharpen",
+              "__enabled": false,
               "Scale": 0.2
             }
           ]
@@ -374,6 +378,6 @@
   },
   "Title": "minimal",
   "Description": "",
-  "LastSaved": "2024-02-22T22:11:20.8810858-08:00",
+  "LastSaved": "2024-02-22T23:04:57.7981467-08:00",
   "__references": []
 }
