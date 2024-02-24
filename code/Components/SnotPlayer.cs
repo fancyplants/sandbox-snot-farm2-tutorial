@@ -116,5 +116,11 @@ public sealed class SnotPlayer : Component
 		{
 			_initialCameraTransform = Camera.Transform.Local;
 		}
+
+		if ( Components.TryGet<SkinnedModelRenderer>(out var model))
+		{
+			var clothing = ClothingContainer.CreateFromLocalUser();
+			clothing.Apply( model );
+		}
 	}
 }
