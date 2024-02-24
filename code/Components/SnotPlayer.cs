@@ -47,6 +47,9 @@ public sealed class SnotPlayer : Component
 	[Property]
 	public Vector3 EyePosition { get; set; }
 
+	// woah! C# has lambda expressions to turn Methods into Properties.
+	public Vector3 EyeWorldPosition => Transform.Local.PointToWorld( EyePosition );
+
 	public Angles EyeAngles { get; set; }
 	Transform _initialCameraTransform;
 	private bool hasDoubleJumped = false;
@@ -65,7 +68,17 @@ public sealed class SnotPlayer : Component
 
 		if ( Camera != null )
 		{
-			Camera.Transform.Local = _initialCameraTransform.RotateAround( EyePosition, EyeAngles.WithYaw( 0f ) );
+			var cameraTransform = _initialCameraTransform.RotateAround( EyePosition, EyeAngles.WithYaw( 0f ) );
+			var cameraPosition = Transform.Local.PointToWorld( cameraTransform.Position );
+			var cameraTrace = Scene.Trace.Ray( EyeWorldPosition, cameraPosition ) // cast ray from eye to camera
+				.Size( 5f ) // make the ray thick-ish to make sure the camera doesn't worm thru cracks
+				.IgnoreGameObjectHierarchy( GameObject ) // ignore all game objects with ray
+				.WithoutTags( "player" ) // make sure the player isn't hit by the ray
+				.Run();
+
+			// set camera location to where this ray ends, so if it hits something like a wall, the camera doesn't phase thru
+			Camera.Transform.Position = cameraTrace.EndPosition;
+			Camera.Transform.LocalRotation = cameraTransform.Rotation;
 		}
 	}
 
@@ -85,7 +98,7 @@ public sealed class SnotPlayer : Component
 		{
 			hasDoubleJumped = false;
 			Controller.Acceleration = 10f;
-			Controller.ApplyFriction( 5f );
+			Controller.ApplyFriction( 5f, 20f );
 			if ( Input.Pressed( "Jump" ) )
 			{
 				Controller.Punch( Vector3.Up * JumpStrength );
@@ -97,7 +110,7 @@ public sealed class SnotPlayer : Component
 			// halving acceleration when mid-air allows less strafing
 			Controller.Acceleration = 5f;
 			// we multiply by Time.Delta here since the gravity should be taking place over this amount
-			if ( Input.Pressed( "Jump" ) && !hasDoubleJumped)
+			if ( Input.Pressed( "Jump" ) && !hasDoubleJumped )
 			{
 				hasDoubleJumped = true;
 
