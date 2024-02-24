@@ -1,6 +1,7 @@
 using Sandbox;
 using Sandbox.Citizen;
 using Sandbox.Diagnostics;
+using System;
 
 public sealed class SnotPlayer : Component
 {
@@ -20,8 +21,8 @@ public sealed class SnotPlayer : Component
 	/// How fast you can walk (units per second)
 	/// </summary>
 	[Property]
-	[Category("Stats")]
-	[Range(0f, 400f, 1f)]
+	[Category( "Stats" )]
+	[Range( 0f, 400f, 1f )]
 	public float WalkSpeed { get; set; } = 120f;
 
 	/// <summary>
@@ -29,7 +30,7 @@ public sealed class SnotPlayer : Component
 	/// </summary>
 	[Property]
 	[Category( "Stats" )]
-	[Range(0f, 1000f, 10f)]
+	[Range( 0f, 1000f, 10f )]
 	public float RunSpeed { get; set; } = 250f;
 
 	/// <summary>
@@ -37,7 +38,7 @@ public sealed class SnotPlayer : Component
 	/// </summary>
 	[Property]
 	[Category( "Stats" )]
-	[Range(0f, 1000f, 10f)]
+	[Range( 0f, 1000f, 10f )]
 	public float JumpStrength { get; set; } = 400f;
 
 	/// <summary>
@@ -48,6 +49,7 @@ public sealed class SnotPlayer : Component
 
 	public Angles EyeAngles { get; set; }
 	Transform _initialCameraTransform;
+	private bool hasDoubleJumped = false;
 
 	protected override void DrawGizmos()
 	{
@@ -61,9 +63,9 @@ public sealed class SnotPlayer : Component
 		EyeAngles = EyeAngles.WithPitch( MathX.Clamp( EyeAngles.pitch, -80f, 80f ) );
 		Transform.Rotation = Rotation.FromYaw( EyeAngles.yaw );
 
-		if (Camera != null )
+		if ( Camera != null )
 		{
-			Camera.Transform.Local = _initialCameraTransform.RotateAround(EyePosition, EyeAngles.WithYaw(0f));
+			Camera.Transform.Local = _initialCameraTransform.RotateAround( EyePosition, EyeAngles.WithYaw( 0f ) );
 		}
 	}
 
@@ -77,16 +79,16 @@ public sealed class SnotPlayer : Component
 
 		// we get the Normal vector of the AnalogMove, since moving diagonally is a vector of length 1.4 otherwise
 		var wishVelocity = Input.AnalogMove.Normal * wishSpeed * Transform.Rotation;
-		Controller.Accelerate(wishVelocity );
+		Controller.Accelerate( wishVelocity );
 
-		if (Controller.IsOnGround)
+		if ( Controller.IsOnGround )
 		{
+			hasDoubleJumped = false;
 			Controller.Acceleration = 10f;
 			Controller.ApplyFriction( 5f );
-			if (Input.Pressed("Jump"))
+			if ( Input.Pressed( "Jump" ) )
 			{
 				Controller.Punch( Vector3.Up * JumpStrength );
-
 				Animator?.TriggerJump();
 			}
 		}
@@ -95,13 +97,28 @@ public sealed class SnotPlayer : Component
 			// halving acceleration when mid-air allows less strafing
 			Controller.Acceleration = 5f;
 			// we multiply by Time.Delta here since the gravity should be taking place over this amount
-			Controller.Velocity += Scene.PhysicsWorld.Gravity * Time.Delta;
+			if ( Input.Pressed( "Jump" ) && !hasDoubleJumped)
+			{
+				hasDoubleJumped = true;
+
+				// cancel out y component
+				//var velocity = Controller.Velocity;
+				//Controller.Velocity = velocity.WithY( Math.Max( 0f, velocity.y ) );
+
+
+				Controller.Punch( Vector3.Up * JumpStrength );
+				Animator?.TriggerJump();
+			}
+			else
+			{
+				Controller.Velocity += Scene.PhysicsWorld.Gravity * Time.Delta;
+			}
 		}
 
 		// does complicated math to move and collide with the world
 		Controller.Move();
 
-		if (Animator != null)
+		if ( Animator != null )
 		{
 			// plays animation that better represents user above ground
 			Animator.IsGrounded = Controller.IsOnGround;
@@ -112,12 +129,12 @@ public sealed class SnotPlayer : Component
 
 	protected override void OnStart()
 	{
-		if (Camera != null)
+		if ( Camera != null )
 		{
 			_initialCameraTransform = Camera.Transform.Local;
 		}
 
-		if ( Components.TryGet<SkinnedModelRenderer>(out var model))
+		if ( Components.TryGet<SkinnedModelRenderer>( out var model ) )
 		{
 			var clothing = ClothingContainer.CreateFromLocalUser();
 			clothing.Apply( model );
