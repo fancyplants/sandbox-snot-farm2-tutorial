@@ -59,7 +59,7 @@
     },
     {
       "Id": "5191f70a-fe56-4dfa-89a0-579ba01a829a",
-      "Name": "GameObject",
+      "Name": "Player",
       "Position": "-180.6408,185.9075,64",
       "Rotation": "0,0,0.7071066,0.7071067",
       "Enabled": true,
@@ -89,6 +89,6 @@
   },
   "Title": "level_1",
   "Description": "",
-  "LastSaved": "2024-02-23T20:45:11.9838828-08:00",
+  "LastSaved": "2024-02-25T17:04:48.8886934-08:00",
   "__references": []
 }

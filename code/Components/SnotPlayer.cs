@@ -47,6 +47,11 @@ public sealed class SnotPlayer : Component
 	[Property]
 	public Vector3 EyePosition { get; set; }
 
+	[Property]
+	[Category( "Stats" )]
+	[Range( 0f, 1000f, 10f )]
+	public float TeleportDistance { get; set; } = 200f;
+
 	// woah! C# has lambda expressions to turn Methods into Properties.
 	public Vector3 EyeWorldPosition => Transform.Local.PointToWorld( EyePosition );
 
@@ -128,6 +133,13 @@ public sealed class SnotPlayer : Component
 			}
 		}
 
+		if (Input.Pressed("Teleport"))
+		{
+			var initialTrans = Controller.Transform.World;
+			// seems like the controller's MoveTo method already handles casting a ray and making sure the user doesn't clip thru walls. Boring!
+			Controller.MoveTo( initialTrans.Position + (initialTrans.Forward * TeleportDistance) , false);
+		}
+
 		// does complicated math to move and collide with the world
 		Controller.Move();
 
@@ -147,6 +159,7 @@ public sealed class SnotPlayer : Component
 			_initialCameraTransform = Camera.Transform.Local;
 		}
 
+		// apply local clothing to player
 		if ( Components.TryGet<SkinnedModelRenderer>( out var model ) )
 		{
 			var clothing = ClothingContainer.CreateFromLocalUser();

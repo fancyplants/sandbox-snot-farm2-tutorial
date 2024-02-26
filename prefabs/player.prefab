@@ -65,6 +65,7 @@
         "EyePosition": "0,0,60.1",
         "JumpStrength": 400,
         "RunSpeed": 250,
+        "TeleportDistance": 200,
         "WalkSpeed": 120
       }
     ],
