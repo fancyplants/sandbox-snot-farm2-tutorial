@@ -67,7 +67,7 @@
         },
         {
           "Name": "Teleport",
-          "KeyboardCode": "alt",
+          "KeyboardCode": "X",
           "GroupName": "Movement"
         },
         {

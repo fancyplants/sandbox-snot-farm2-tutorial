@@ -67,6 +67,13 @@
         "RunSpeed": 250,
         "TeleportDistance": 200,
         "WalkSpeed": 120
+      },
+      {
+        "__type": "UnitInfo",
+        "HealthRegenAmount": 0.5,
+        "HealthRegenTimer": 3,
+        "MaxHealth": 5,
+        "Team": "Player"
       }
     ],
     "Children": [
