@@ -188,7 +188,7 @@ public sealed class SnotPlayer : Component
 		}
 
 		// check if player is trying to punch, and make sure it's been longer than the cooldown since last punch
-		if (Input.Pressed("Punch") && _lastPunch >= PunchCooldown)
+		if ( Input.Pressed( "Punch" ) && _lastPunch >= PunchCooldown )
 		{
 			Punch();
 		}
@@ -215,6 +215,21 @@ public sealed class SnotPlayer : Component
 		{
 			Animator.HoldType = CitizenAnimationHelper.HoldTypes.Punch;
 			Animator.Target.Set( "b_attack", true );
+		}
+
+		// cast a ray out from where the player is looking out with a length of their punch range. 
+		var punchTrace = Scene.Trace
+			.FromTo( EyeWorldPosition, EyeWorldPosition + EyeAngles.Forward * PunchRange )
+			.Size( 10f )
+			.WithoutTags( "player" )
+			// this basically says to not hit any part of the player
+			.IgnoreGameObjectHierarchy( GameObject )
+			.Run();
+
+		// if we hit something, try to see if it has a UnitInfo component. If it does, damage it!
+		if ( punchTrace.Hit && punchTrace.GameObject.Components.TryGet<UnitInfo>( out var unitInfo ) )
+		{
+			unitInfo.Damage( PunchStrength );
 		}
 
 		// reset timer for last punch time
