@@ -64,6 +64,9 @@
         },
         "EyePosition": "0,0,60.1",
         "JumpStrength": 400,
+        "PunchCooldown": 0.5,
+        "PunchRange": 90,
+        "PunchStrength": 1,
         "RunSpeed": 250,
         "TeleportDistance": 200,
         "WalkSpeed": 120

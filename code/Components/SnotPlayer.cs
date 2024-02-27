@@ -42,6 +42,30 @@ public sealed class SnotPlayer : Component
 	public float JumpStrength { get; set; } = 400f;
 
 	/// <summary>
+	/// How much damage a punch deals
+	/// </summary>
+	[Property]
+	[Category( "Stats" )]
+	[Range( 0f, 5f, 0.1f )]
+	public float PunchStrength { get; set; } = 1f;
+
+	/// <summary>
+	/// How long until you can punch again
+	/// </summary>
+	[Property]
+	[Category( "Stats" )]
+	[Range( 0f, 2f, 0.1f )]
+	public float PunchCooldown { get; set; } = 0.5f;
+
+	/// <summary>
+	/// How far away you can punch in Hammer Units
+	/// </summary>
+	[Property]
+	[Category( "Stats" )]
+	[Range( 0f, 200f, 5f )]
+	public float PunchRange { get; set; } = 50f;
+
+	/// <summary>
 	/// Where the camera rotates around and the aim originates from
 	/// </summary>
 	[Property]
@@ -57,11 +81,19 @@ public sealed class SnotPlayer : Component
 
 	public Angles EyeAngles { get; set; }
 	Transform _initialCameraTransform;
+	TimeSince _lastPunch;
+
 	private bool hasDoubleJumped = false;
 
 	protected override void DrawGizmos()
 	{
-		Gizmo.Draw.LineSphere( EyePosition, 10f );
+		if ( !Gizmo.IsSelected ) return;
+
+		var draw = Gizmo.Draw;
+
+		// see where eyes are
+		draw.LineSphere( EyePosition, 10f );
+		draw.LineCylinder( EyePosition, EyePosition + Transform.Rotation.Forward * PunchRange, 5f, 5f, 10 );
 	}
 
 	protected override void OnUpdate()
@@ -133,11 +165,11 @@ public sealed class SnotPlayer : Component
 			}
 		}
 
-		if (Input.Pressed("Teleport"))
+		if ( Input.Pressed( "Teleport" ) )
 		{
 			var initialTrans = Controller.Transform.World;
 			// seems like the controller's MoveTo method already handles casting a ray and making sure the user doesn't clip thru walls. Boring!
-			Controller.MoveTo( initialTrans.Position + (initialTrans.Forward * TeleportDistance) , false);
+			Controller.MoveTo( initialTrans.Position + (initialTrans.Forward * TeleportDistance), false );
 		}
 
 		// does complicated math to move and collide with the world
@@ -149,6 +181,16 @@ public sealed class SnotPlayer : Component
 			Animator.IsGrounded = Controller.IsOnGround;
 			// incredible helper method that animates the player walking/running based on speed
 			Animator.WithVelocity( Controller.Velocity );
+
+			// lower fists if it's been longer than 2 seconds since last punch
+			if ( _lastPunch >= 2f )
+				Animator.HoldType = CitizenAnimationHelper.HoldTypes.None;
+		}
+
+		// check if player is trying to punch, and make sure it's been longer than the cooldown since last punch
+		if (Input.Pressed("Punch") && _lastPunch >= PunchCooldown)
+		{
+			Punch();
 		}
 	}
 
@@ -165,5 +207,17 @@ public sealed class SnotPlayer : Component
 			var clothing = ClothingContainer.CreateFromLocalUser();
 			clothing.Apply( model );
 		}
+	}
+
+	public void Punch()
+	{
+		if ( Animator != null )
+		{
+			Animator.HoldType = CitizenAnimationHelper.HoldTypes.Punch;
+			Animator.Target.Set( "b_attack", true );
+		}
+
+		// reset timer for last punch time
+		_lastPunch = 0f;
 	}
 }
