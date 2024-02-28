@@ -64,6 +64,13 @@
       "Rotation": "0,0,0.7071066,0.7071067",
       "Enabled": true,
       "__Prefab": "prefabs/player.prefab"
+    },
+    {
+      "Id": "768eb797-2a11-42f4-8139-ff64de2cf571",
+      "Name": "GameObject",
+      "Position": "-196.2562,988.9637,0.547245",
+      "Enabled": true,
+      "__Prefab": "prefabs/snot.prefab"
     }
   ],
   "SceneProperties": {
@@ -89,6 +96,6 @@
   },
   "Title": "level_1",
   "Description": "",
-  "LastSaved": "2024-02-26T22:41:43.9920182-08:00",
+  "LastSaved": "2024-02-26T23:15:49.8528884-08:00",
   "__references": []
 }
